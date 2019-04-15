@@ -1,0 +1,112 @@
+angular module bootstrap
+factory
+service
+provider
+filter
+
+
+AngularJS services are functions or objects that can hold behavior or state throughout application. They are used to implement shared behavior/reusable logic which can be used by other components in your AngularJS application. AngularJS services are singletons, means each service is instantiated only once, so each part of our application gets access to the same instance of the AngularJS service. AngularJS services are lazily instantiated, means Angular only instantiates a service when an application component who depends on it [another service, controller or directive e.g.], gets loaded.
+
+
+
+
+
+Do note that AngularJS services are different than AngularJS controllers. Controllers are created and destroyed several times while navigating to different views, but services are instantiated only once and then reused everywhere in application.
+
+Common use of Services : Communicating with Server, Repeated behavior, Reusable business logic, application-level stores, shared state, etc.
+
+AngularJS services & Dependency Management
+The whole AngularJS service concept is driven by AngularJS Dependency Injection system. Any service can be injected into another service, controller or directive, by just declaring it as a dependency, and AngularJS will do the rest.
+
+AngularJS Built-in services
+$log, $window, $location, $http are few examples of built-in services. A built-in AngularJS service name starts with $. For complete list, check out the AngularJS documentation.
+
+An AngularJS service can be implemented as a factory, service, or provider. Choosing specially between factory and provider depends on your coding style and preference.
+
+custom services:
+---------------
+
+1. Factory
+A Factory is created using module.factory function. It is useful if you follow a functional style of programming and you prefer to return functions and objects.
+
+myApp.factory('Greetingservice',[function(){
+	return {
+		sayHello:function(name){
+			return "Hello " + name;
+		}
+	}
+}]);
+
+myApp.controller("myController",['Greetingservice','$scope',function(Greetingservice,$scope){
+$scope.factorymsg = "factory " +Greetingservice.sayHello($scope.name);
+});
+
+
+2. Service
+A Service is created using module.service function. It is useful if you follow a Class/OO style of programming, where we define classes and types instead of functions and objects. With service, the function definition is actually a class/type, and AngularJS calls new on it to create an instance of it. But remember. only one instance will be created, as we know that AngularJS services are singletons.
+
+myApp.service('newService',[function(){
+this.sayHai = function(name){
+	return "Hai "+name;
+}
+
+}]);
+
+myApp.controller("myController",['$scope','newService',function($scope,newService){
+$scope.name = "chandra";
+$scope.servicemsg = "service " +newService.sayHai($scope.name);
+
+}]);
+
+3. Provider
+Creating an AngularJS Service using provider is not a very common approach, but comes handy when you want to provide a configuration for your service before it can be used. A provider is used to create a configurable service object. In this approach you usually provide the service configuration using module.config function. Provider includes a $get function which gets executed in run phase. It is the return value from the $get function [the service which you configured based on your requirement] that will be cached and injected when the service is requested.
+
+<script src="angular-min.js"></script>
+<script>
+var myApp = angular.module('myApp',[]);
+myApp.provider('message',[function(){
+	var temp =null;
+	this.messagefromclient = function(name){
+		temp = name;
+	}
+	this.$get = function(){
+		return {
+			messagefromprovider : temp
+		}
+	}
+}]);
+myApp.config(function(messageProvider){
+
+	messageProvider.messagefromclient("hello world");
+});
+
+myApp.controller("myController",['message','$scope',function(message,$scope){
+$scope.msg = message.messagefromprovider;
+
+}])
+
+</script>
+
+<body ng-app="myApp">
+	<div ng-controller="myController">
+	{{msg}}
+	</div>
+</body>
+
+
+
+Angular-js filters:
+-------------------
+myApp.filter("capitalize",function(){
+        return function(input){
+            
+            return (input)? input.charAt(0).toUpperCase()+input.substr(1).toLowerCase():"";
+        }
+    });
+
+
+
+
+
+
+
